@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#F3F4F6">
+    <title>TalentTrack Pro</title>
+    <!-- Tailwind CSS for modern styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Noto Sans for multi-language support -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&family=Noto+Sans+Tamil:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@0.395.0/dist/umd/lucide.js"></script>
+    
+    <script>
+      // Customizing Tailwind theme with the TalentTrack color palette
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Noto Sans', 'Noto Sans Tamil', 'Noto Sans Devanagari', 'sans-serif'],
+            },
+            colors: {
+              light: {
+                  bg: '#F3F4F6',
+                  surface: '#FFFFFF',
+                  text: '#111827',
+                  subtext: '#6B7280',
+                  border: '#E5E7EB'
+              },
+              primary: {
+                DEFAULT: '#8B5CF6',
+                '50': '#F5F3FF', '100': '#EDE9FE', '200': '#DDD6FE', '300': '#C4B5FD', '400': '#A78BFA', '500': '#8B5CF6', '600': '#7C3AED', '700': '#6D28D9', '800': '#5B21B6', '900': '#4C1D95',
+              }
+            },
+          }
+        }
+      }
+    </script>
+    <style>
+      /* --- Default Light Theme Styles --- */
+      html, body {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        overflow-x: hidden;
+        background-color: #F3F4F6;
+        color: #111827;
+      }
+      body, #app-container {
+        font-family: 'Noto Sans', 'Noto Sans Tamil', 'Noto Sans Devanagari', 'sans-serif';
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .form-input { 
+        background-color: #FFFFFF; 
+        border: 1px solid #D1D5DB; 
+        color: #111827;
+      }
+      .nav-bg { 
+        background-color: rgba(255, 255, 255, 0.8); 
+        backdrop-filter: blur(8px); 
+        border-color: #E5E7EB; 
+      }
+      .surface-bg { 
+        background-color: #FFFFFF; 
+        border: 1px solid #E5E7EB;
+        box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      }
+      .subtext { color: #6B7280; }
+      
+      .page {
+        display: none;
+        animation: fadeIn 0.4s ease-in-out;
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        overflow-y: auto;
+        flex-direction: column;
+      }
+      .page.active { display: flex; }
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(8px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      .glow-shadow { 
+        box-shadow: 0 10px 15px -3px rgba(139, 92, 246, 0.2), 0 4px 6px -2px rgba(139, 92, 246, 0.1); 
+      }
+      .form-input:focus {
+          outline: none;
+          box-shadow: 0 0 0 2px #8B5CF6;
+          border-color: transparent;
+      }
+      .leaderboard-scope-btn.active {
+          background-color: #8B5CF6;
+          color: white;
+      }
+      ::-webkit-scrollbar { width: 4px; }
+      ::-webkit-scrollbar-track { background: #E5E7EB; }
+      ::-webkit-scrollbar-thumb { background: #8B5CF6; border-radius: 2px; }
+      input[type=number]::-webkit-inner-spin-button,
+      input[type=number]::-webkit-outer-spin-button {
+        -webkit-appearance: none; margin: 0;
+      }
+      input[type=number] { -moz-appearance: textfield; }
+      .badge-icon-bronze { color: #CD7F32; }
+      .badge-icon-silver { color: #C0C0C0; }
+      .badge-icon-gold { color: #FFD700; }
+      .badge-locked { filter: grayscale(100%); opacity: 0.5; }
+    </style>
+</head>
+<body>
+
+    <div id="app-container" class="max-w-md mx-auto h-[100dvh] flex flex-col relative overflow-hidden">
+      <!-- Main Content Area where pages are swapped -->
+      <main id="main-content" class="flex-1 relative">
+        
+        <div id="splash-page" class="page active items-center justify-center surface-bg">
+            <div class="text-center">
+                <i data-lucide="award" class="w-20 h-20 text-primary glow-shadow rounded-full p-2"></i>
+                <h1 data-translate="app_title" class="text-4xl font-bold mt-4 text-light-text">TalentTrack</h1>
+                <p data-translate="app_subtitle" class="subtext">Find Your Edge.</p>
+            </div>
+        </div>
+
+        <div id="auth-page" class="page justify-center p-6 surface-bg">
+           <div class="w-full">
+            <h1 data-translate="get_started_title" class="text-3xl font-bold text-center text-light-text">Get Started</h1>
+            <p data-translate="get_started_subtitle" class="subtext text-center mb-8">Join the next generation of athletes.</p>
+             <div class="space-y-4">
+                <button onclick="navigateTo('login-page')" class="w-full bg-primary text-white font-bold py-3 rounded-xl hover:bg-primary-600 transition-all duration-300 glow-shadow" data-translate="login">Login</button>
+                <button onclick="navigateTo('register-page')" class="w-full surface-bg text-primary font-bold py-3 rounded-xl hover:bg-gray-100 transition" data-translate="register">Register</button>
+            </div>
+           </div>
+        </div>
+        
+        <div id="login-page" class="page p-6 surface-bg">
+            <button onclick="history.back()" class="flex items-center gap-2 text-primary mb-6"><i data-lucide="arrow-left" class="w-5 h-5"></i> <span data-translate="back">Back</span></button>
+            <h1 data-translate="login_title" class="text-3xl font-bold text-light-text">Welcome Back</h1>
+            <p data-translate="login_subtitle" class="subtext mb-6">Log in to continue your journey.</p>
+            <form id="login-form" class="space-y-4">
+                <div>
+                    <label for="login-email" class="text-sm font-medium subtext" data-translate="email">Email</label>
+                    <input type="email" id="login-email" class="w-full form-input mt-1" value="athlete@talenttrack.com">
+                </div>
+                <div>
+                    <label for="login-password" class="text-sm font-medium subtext" data-translate="password">Password</label>
+                    <input type="password" id="login-password" class="w-full form-input mt-1" value="password">
+                </div>
+                <p id="login-error" class="text-red-500 text-sm text-center hidden h-5"></p>
+                <button type="submit" class="w-full bg-primary text-white font-bold py-3 rounded-xl mt-4 glow-shadow" data-translate="login">Login</button>
+            </form>
+        </div>
+
+        <div id="register-page" class="page p-6 surface-bg">
+            <button onclick="history.back()" class="flex items-center gap-2 text-primary mb-6"><i data-lucide="arrow-left" class="w-5 h-5"></i> <span data-translate="back">Back</span></button>
+            <h1 data-translate="register_title" class="text-3xl font-bold text-light-text">Create Account</h1>
+            <p data-translate="register_subtitle" class="subtext mb-6">Join the community of athletes.</p>
+            <form id="register-form" class="space-y-4">
+                 <div class="grid grid-cols-2 gap-4">
+                    <input type="text" id="register-first-name" class="form-input" data-translate-placeholder="first_name" placeholder="First Name" required>
+                    <input type="text" id="register-last-name" class="form-input" data-translate-placeholder="last_name" placeholder="Last Name" required>
+                </div>
+                <input type="email" id="register-email" class="form-input" data-translate-placeholder="email" placeholder="Email Address" required>
+                <input type="number" id="register-phone" class="form-input" data-translate-placeholder="phone" placeholder="Phone Number (10 digits)" required>
+                <input type="number" id="register-aadhar" class="form-input" data-translate-placeholder="aadhar" placeholder="Aadhaar Number (12 digits)" required>
+                <input type="password" id="register-password" class="form-input" data-translate-placeholder="password" placeholder="Password" required>
+                 <div class="grid grid-cols-2 gap-4">
+                    <input type="number" id="register-age" class="form-input" data-translate-placeholder="age" placeholder="Age" required>
+                    <select id="register-gender" class="form-input" required>
+                        <option value="" disabled selected data-translate="select_gender">Select Gender</option>
+                        <option value="Male" data-translate="male">Male</option>
+                        <option value="Female" data-translate="female">Female</option>
+                        <option value="Other" data-translate="other">Other</option>
+                    </select>
+                </div>
+                <input type="text" id="register-sport" class="form-input" data-translate-placeholder="primary_sport" placeholder="Primary Sport" required>
+                <select id="register-state" class="form-input" required>
+                    <option value="" disabled selected data-translate="select_state">Select State</option>
+                    <option>Delhi</option> <option>Haryana</option> <option>Maharashtra</option> <option>Punjab</option> <option>Tamil Nadu</option> <option>Uttar Pradesh</option>
+                </select>
+                 <select id="register-religion" class="form-input" required>
+                    <option value="" disabled selected data-translate="select_religion">Select Religion</option>
+                    <option>Hinduism</option> <option>Islam</option> <option>Christianity</option> <option>Sikhism</option> <option>Buddhism</option> <option>Jainism</option> <option>Atheism</option> <option>Other</option>
+                </select>
+                <p id="register-error" class="text-red-500 text-sm text-center hidden h-5"></p>
+                <button type="submit" class="w-full bg-primary text-white font-bold py-3 rounded-xl mt-4 glow-shadow" data-translate="register_title">Create Account</button>
+            </form>
+        </div>
+
+        <div id="home-page" class="page p-6 gap-6">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <img id="home-avatar" src="https://placehold.co/48x48/8B5CF6/ffffff?text=A" class="w-12 h-12 rounded-full border-2 border-primary object-cover">
+                    <div>
+                        <p data-translate="welcome_back" class="subtext text-sm">Welcome back,</p>
+                        <h2 id="home-username" class="font-bold text-lg -mt-1 text-light-text">Athlete</h2>
+                    </div>
+                </div>
+                <button onclick="navigateTo('settings-page')" class="p-2 rounded-full hover:bg-gray-200"><i data-lucide="settings" class="w-6 h-6 subtext"></i></button>
+            </div>
+            <div class="surface-bg rounded-xl p-4 text-center">
+                 <p data-translate="current_xp" class="subtext">Your Current XP</p>
+                 <p id="home-xp" class="text-4xl font-bold text-primary">0 XP</p>
+                 <div class="w-full bg-gray-200 rounded-full h-2 mt-2"><div id="home-xp-bar" class="bg-primary h-2 rounded-full" style="width: 10%"></div></div>
+                 <p id="home-level" class="text-sm subtext mt-1 text-right">Level 1</p>
+            </div>
+            <div class="flex-1 flex flex-col items-center justify-center">
+                 <button onclick="navigateTo('test-selection-page')" class="bg-primary rounded-full w-40 h-40 flex items-center justify-center text-white font-bold text-2xl glow-shadow hover:scale-105 transition-transform" data-translate="start_test">Start Test</button>
+            </div>
+             <div class="grid grid-cols-3 gap-4 text-center">
+                <button onclick="navigateTo('missions-page')" class="surface-bg p-4 rounded-xl flex flex-col items-center gap-2 hover:bg-gray-100"><i data-lucide="target" class="w-6 h-6 text-primary"></i><span data-translate="missions" class="text-xs font-semibold text-light-text">Missions</span></button>
+                 <button onclick="navigateTo('events-page')" class="surface-bg p-4 rounded-xl flex flex-col items-center gap-2 hover:bg-gray-100"><i data-lucide="calendar" class="w-6 h-6 text-primary"></i><span data-translate="events" class="text-xs font-semibold text-light-text">Events</span></button>
+                 <button onclick="navigateTo('info-page')" class="surface-bg p-4 rounded-xl flex flex-col items-center gap-2 hover:bg-gray-100"><i data-lucide="info" class="w-6 h-6 text-primary"></i><span data-translate="info" class="text-xs font-semibold text-light-text">Info</span></button>
+            </div>
+        </div>
+        
+        <div id="test-selection-page" class="page p-6">
+            <button onclick="history.back()" class="flex items-center gap-2 text-primary mb-6"><i data-lucide="arrow-left" class="w-5 h-5"></i> <span data-translate="back">Back</span></button>
+            <h1 data-translate="select_test" class="text-3xl font-bold text-light-text">Select a Test</h1>
+            <p data-translate="select_test_subtitle" class="subtext mb-6">Choose a test to record or upload your performance.</p>
+            <div id="test-list" class="space-y-4"></div>
+        </div>
+        
+        <div id="upload-or-record-page" class="page p-6 justify-center">
+             <button onclick="history.back()" class="absolute top-6 left-6 flex items-center gap-2 text-primary"><i data-lucide="arrow-left" class="w-5 h-5"></i> <span data-translate="back">Back</span></button>
+             <div class="text-center w-full">
+                 <h1 id="upload-record-title" class="text-2xl font-bold text-light-text">Submit Performance</h1>
+                 <p data-translate="submit_performance_subtitle" class="subtext mb-8">Choose how to submit your video for the test.</p>
+                 <div class="space-y-4">
+                       <button id="nav-to-record-btn" class="w-full surface-bg font-bold py-8 rounded-xl flex flex-col items-center justify-center hover:border-primary text-light-text"><i data-lucide="video" class="w-10 h-10 mb-2 text-primary"></i><span data-translate="record_video">Record Video</span></button>
+                       <button id="nav-to-upload-btn" class="w-full surface-bg font-bold py-8 rounded-xl flex flex-col items-center justify-center hover:border-primary text-light-text"><i data-lucide="upload-cloud" class="w-10 h-10 mb-2 text-primary"></i><span data-translate="upload_device">Upload from Device</span></button>
+                 </div>
+             </div>
+        </div>
+
+        <div id="record-page" class="page bg-black">
+            <div class="nav-bg p-4 flex justify-between items-center z-10 border-b border-gray-200">
+                <button onclick="handleBackFromTest()" class="text-primary"><i data-lucide="arrow-left" class="w-6 h-6"></i></button>
+                <h2 id="record-test-title" class="text-lg font-bold text-light-text">Test Name</h2>
+                <button onclick="handleSkipTest()" class="text-sm text-primary font-semibold" data-translate="skip">Skip</button>
+            </div>
+            <div class="flex-1 relative bg-black flex items-center justify-center">
+                <video id="video-preview" class="w-full h-full object-cover" autoplay muted playsinline></video>
+                <div id="camera-placeholder" class="text-center text-gray-400 hidden p-4"><i data-lucide="video-off" class="w-12 h-12 mx-auto"></i><p id="camera-message" class="mt-2 text-sm" data-translate="requesting_camera">Requesting camera access...</p></div>
+                <div id="recording-indicator" class="hidden absolute top-4 left-4 flex items-center space-x-2 bg-red-600 text-white px-3 py-1 rounded-full text-sm font-medium animate-pulse"><span class="w-2 h-2 bg-white rounded-full"></span><span>REC</span></div>
+            </div>
+            <div class="nav-bg p-4 z-10 border-t border-gray-200">
+                <div id="recorder-controls" class="flex flex-col items-center gap-4">
+                     <div class="flex w-full items-center justify-center gap-4">
+                         <button id="start-record-btn" class="flex-1 flex items-center justify-center gap-2 bg-red-600 text-white font-semibold px-6 py-3 rounded-lg"><i data-lucide="circle" class="w-5 h-5"></i><span data-translate="start">Start</span></button>
+                         <button id="stop-record-btn" class="hidden flex-1 items-center justify-center gap-2 bg-gray-200 text-gray-800 font-semibold px-6 py-3 rounded-lg"><i data-lucide="square" class="w-5 h-5"></i><span data-translate="stop">Stop</span></button>
+                     </div>
+                </div>
+                <div id="submission-controls" class="hidden w-full flex gap-4">
+                    <button id="retake-btn" class="flex-1 bg-gray-200 font-semibold py-3 rounded-lg text-light-text" data-translate="retake">Retake</button>
+                    <button id="submit-video-btn" class="flex-1 bg-primary text-white font-semibold py-3 rounded-lg" data-translate="submit">Submit</button>
+                </div>
+            </div>
+        </div>
+        
+        <div id="upload-page" class="page p-6 justify-center">
+            <button onclick="history.back()" class="absolute top-6 left-6 flex items-center gap-2 text-primary"><i data-lucide="arrow-left" class="w-5 h-5"></i> <span data-translate="back">Back</span></button>
+            <div class="w-full text-center">
+                <h1 id="upload-test-title" class="text-2xl font-bold text-light-text mb-2">Upload File</h1>
+                <p class="subtext mb-8" data-translate="upload_subtitle">Select a video file from your device.</p>
+                <div class="flex flex-col items-center gap-4">
+                    <input type="file" id="file-upload-input" class="hidden" accept="video/*">
+                    <button id="upload-btn" class="w-full surface-bg font-semibold py-8 rounded-xl flex flex-col items-center justify-center border-2 border-dashed border-primary text-light-text">
+                        <i data-lucide="upload" class="w-10 h-10 mb-2 text-primary"></i>
+                        <span data-translate="choose_file">Choose File</span>
+                    </button>
+                    <p id="file-name" class="text-sm subtext h-5"></p>
+                    <button id="submit-file-btn" disabled class="w-full bg-primary font-semibold py-3 rounded-lg disabled:opacity-50" data-translate="submit_file">Submit File</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="submissions-page" class="page p-6">
+            <div class="flex justify-between items-center mb-6"><div><h1 class="text-3xl font-bold text-light-text" data-translate="activity">Activity</h1><p class="subtext" data-translate="activity_subtitle">Review the status of your submitted tests.</p></div><button id="refresh-status-btn" class="p-2 surface-bg rounded-lg text-primary"><i data-lucide="refresh-cw" class="w-5 h-5"></i></button></div>
+              <div id="submission-list" class="space-y-4"><p id="no-submissions" class="text-center subtext pt-8" data-translate="no_submissions">No submissions yet.</p></div>
+        </div>
+        
+        <div id="submission-detail-page" class="page p-6">
+            <button onclick="history.back()" class="flex items-center gap-2 text-primary mb-6"><i data-lucide="arrow-left" class="w-5 h-5"></i> <span data-translate="back">Back</span></button>
+            <h1 id="detail-test-name" class="text-3xl font-bold text-light-text">Test Result</h1>
+            <p class="subtext mb-6" data-translate="submission_details_subtitle">Detailed feedback on your performance.</p>
+            <div class="space-y-4">
+                <div class="surface-bg p-4 rounded-lg flex justify-between items-center">
+                    <span class="subtext" data-translate="status">Status</span>
+                    <span id="detail-status" class="text-xs font-semibold px-2 py-1 rounded-full"></span>
+                </div>
+                <div class="surface-bg p-4 rounded-lg flex justify-between items-center">
+                    <span class="subtext" data-translate="score">Score</span>
+                    <span id="detail-score" class="font-bold text-light-text"></span>
+                </div>
+                <div class="surface-bg p-4 rounded-lg flex justify-between items-center">
+                    <span class="subtext" data-translate="xp_earned">XP Earned</span>
+                    <span id="detail-xp" class="font-bold text-primary"></span>
+                </div>
+                <div class="surface-bg p-4 rounded-lg">
+                    <h2 class="subtext mb-2" data-translate="feedback">Feedback</h2>
+                    <p id="detail-feedback" class="text-light-text"></p>
+                </div>
+            </div>
+        </div>
+
+        <div id="leaderboard-page" class="page p-6">
+            <h1 data-translate="leaderboard" class="text-3xl font-bold text-light-text mb-4">Leaderboard</h1>
+            <div class="flex p-1 rounded-lg bg-gray-200 mb-4">
+                <button data-scope="district" class="leaderboard-scope-btn flex-1 py-2 rounded-md text-sm font-semibold subtext" data-translate="district">District</button>
+                <button data-scope="state" class="leaderboard-scope-btn flex-1 py-2 rounded-md text-sm font-semibold subtext" data-translate="state">State</button>
+                <button data-scope="national" class="leaderboard-scope-btn flex-1 py-2 rounded-md text-sm font-semibold subtext" data-translate="national">National</button>
+            </div>
+            <div id="leaderboard-list" class="space-y-3"></div>
+        </div>
+
+        <div id="profile-page" class="page p-6">
+             <div class="flex flex-col items-center text-center">
+                <img id="profile-avatar" src="https://placehold.co/80x80/8B5CF6/ffffff?text=A" class="w-20 h-20 rounded-full border-4 border-primary object-cover glow-shadow">
+                <h1 id="profile-name" class="text-2xl font-bold mt-4 text-light-text">Athlete Name</h1>
+                <p id="profile-details" class="subtext">Age 0 | Sport</p>
+            </div>
+            <div class="mt-8 surface-bg p-4 rounded-xl">
+                 <h2 class="text-lg font-bold mb-4 text-light-text" data-translate="badges">Badges</h2>
+                 <div class="grid grid-cols-4 gap-4 text-center">
+                       <div class="flex flex-col items-center" id="badge-bronze"><i data-lucide="award" class="w-10 h-10 badge-icon-bronze"></i><p class="text-xs mt-1 subtext" data-translate="rookie">Rookie</p></div>
+                       <div class="flex flex-col items-center" id="badge-silver"><i data-lucide="award" class="w-10 h-10 badge-icon-silver"></i><p class="text-xs mt-1 subtext" data-translate="elite">Elite</p></div>
+                       <div class="flex flex-col items-center" id="badge-gold"><i data-lucide="award" class="w-10 h-10 badge-icon-gold"></i><p class="text-xs mt-1 subtext" data-translate="legend">Legend</p></div>
+                       <div class="flex flex-col items-center" id="badge-locked"><i data-lucide="lock" class="w-10 h-10 subtext"></i><p class="text-xs mt-1 subtext" data-translate="top_tier">Top Tier</p></div>
+                 </div>
+            </div>
+             <div class="mt-4"><button onclick="navigateTo('edit-profile-page')" class="w-full surface-bg font-semibold py-3 rounded-xl flex items-center justify-center gap-2 text-light-text hover:bg-gray-100"><i data-lucide="edit-3" class="w-5 h-5"></i> <span data-translate="edit_profile">Edit Profile</span></button></div>
+        </div>
+
+        <div id="edit-profile-page" class="page p-6">
+            <button onclick="history.back()" class="flex items-center gap-2 text-primary mb-6"><i data-lucide="arrow-left" class="w-5 h-5"></i> <span data-translate="back">Back</span></button>
+            <h1 data-translate="edit_profile" class="text-3xl font-bold text-light-text">Edit Profile</h1>
+            <p data-translate="edit_profile_subtitle" class="subtext mb-6">Update your personal information.</p>
+            <div class="flex flex-col items-center mb-6"><div class="relative"><img id="edit-profile-preview" src="https://placehold.co/96x96/8B5CF6/ffffff?text=A" class="w-24 h-24 rounded-full border-4 border-primary object-cover glow-shadow"><label for="profile-pic-upload" class="absolute -bottom-1 -right-1 surface-bg p-2 rounded-full cursor-pointer hover:opacity-80 border border-gray-200"><i data-lucide="camera" class="w-5 h-5 text-primary"></i></label><input type="file" id="profile-pic-upload" class="hidden" accept="image/*"></div></div>
+            <form id="edit-profile-form" class="space-y-4"><div class="grid grid-cols-2 gap-4"><input type="text" id="edit-first-name" class="form-input" data-translate-placeholder="first_name" placeholder="First Name"><input type="text" id="edit-last-name" class="form-input" data-translate-placeholder="last_name" placeholder="Last Name"></div><input type="number" id="edit-age" class="form-input" data-translate-placeholder="age" placeholder="Age"><input type="text" id="edit-sport" class="form-input" data-translate-placeholder="primary_sport" placeholder="Primary Sport"><button type="submit" class="w-full bg-primary text-white font-bold py-3 rounded-xl mt-4 glow-shadow" data-translate="save_changes">Save Changes</button></form>
+        </div>
+        
+        <div id="settings-page" class="page p-6">
+            <button onclick="history.back()" class="flex items-center gap-2 text-primary mb-6"><i data-lucide="arrow-left" class="w-5 h-5"></i> <span data-translate="back">Back</span></button>
+            <h1 data-translate="settings" class="text-3xl font-bold text-light-text">Settings</h1><p data-translate="settings_subtitle" class="subtext mb-8">Personalize your experience.</p>
+            <div class="space-y-6">
+                  <div><h2 class="font-bold text-lg mb-2 text-light-text" data-translate="language">Language</h2><select id="language-select" class="w-full form-input"><option value="en">English</option><option value="ta">Tamil (தமிழ்)</option><option value="hi">Hindi (हिन्दी)</option></select></div>
+                  <div><h2 class="font-bold text-lg mb-2 text-light-text" data-translate="account">Account</h2><button onclick="navigateTo('edit-profile-page')" class="w-full text-left surface-bg font-semibold p-4 rounded-xl flex items-center justify-between text-light-text"><span data-translate="edit_profile">Edit Profile</span><i data-lucide="chevron-right" class="w-5 h-5"></i></button></div>
+            </div>
+            <button id="logout-btn" class="w-full bg-red-500/10 text-red-600 font-bold py-3 rounded-xl absolute bottom-6 left-1/2 -translate-x-1/2 max-w-[calc(100%-3rem)]" data-translate="logout">Logout</button>
+        </div>
+
+        <div id="missions-page" class="page p-6"><button onclick="history.back()" class="flex items-center gap-2 text-primary mb-6"><i data-lucide="arrow-left" class="w-5 h-5"></i> <span data-translate="back">Back</span></button><h1 data-translate="missions" class="text-3xl font-bold text-light-text">Daily Missions</h1><p data-translate="missions_subtitle" class="subtext mb-6">Complete challenges for extra XP!</p><div class="surface-bg p-4 rounded-lg border-l-4 border-primary space-y-2"><div><p data-translate="mission1_title" class="font-bold text-light-text">Speed Demon</p><p data-translate="mission1_desc" class="text-sm subtext">Complete one 40m Sprint test today.</p></div><div class="flex justify-between items-center"><span class="text-sm font-semibold text-primary" data-translate="mission1_reward">Reward: 50 XP</span><button onclick="navigateTo('test-selection-page')" class="bg-primary text-white text-xs font-bold px-3 py-1.5 rounded-md" data-translate="go">Go!</button></div></div></div>
+        <div id="events-page" class="page p-6"><button onclick="history.back()" class="flex items-center gap-2 text-primary mb-6"><i data-lucide="arrow-left" class="w-5 h-5"></i> <span data-translate="back">Back</span></button><h1 data-translate="events" class="text-3xl font-bold text-light-text">Upcoming Events</h1><p data-translate="events_subtitle" class="subtext mb-6">Find official SAI events near you.</p><div class="space-y-4"><div class="surface-bg p-4 rounded-lg space-y-1"><p data-translate="event1_title" class="font-bold text-light-text">Khelo India Youth Games</p><p class="text-sm subtext" data-translate="event1_details">Date: 15 Oct 2025 | Location: Chennai, TN</p></div><div class="surface-bg p-4 rounded-lg space-y-1"><p data-translate="event2_title" class="font-bold text-light-text">National Athletics Trials</p><p class="text-sm subtext" data-translate="event2_details">Date: 05 Nov 2025 | Location: Patiala, PB</p></div></div></div>
+        <div id="info-page" class="page p-6"><button onclick="history.back()" class="flex items-center gap-2 text-primary mb-6"><i data-lucide="arrow-left" class="w-5 h-5"></i> <span data-translate="back">Back</span></button><h1 data-translate="info" class="text-3xl font-bold text-light-text">Information</h1><p data-translate="info_subtitle" class="subtext mb-6">About the app and policies.</p><div class="space-y-4"><div><h2 data-translate="about_app" class="text-lg font-bold text-light-text mb-2">About TalentTrack</h2><p data-translate="about_app_desc" class="text-sm subtext">This app is an official tool by the Sports Authority of India (SAI) to democratize talent identification using modern technology.</p></div><div><h2 data-translate="fair_play" class="text-lg font-bold text-light-text mb-2">Fair Play Policy</h2><ul class="list-disc list-inside text-sm subtext space-y-1"><li data-translate="fair_play1">All submitted videos must be authentic, unedited performances.</li><li data-translate="fair_play2">Our AI uses cheat detection to ensure fair assessments.</li><li data-translate="fair_play3">Please perform tests in a safe, clear environment.</li></ul></div></div></div>
+
+      </main>
+
+      <nav id="bottom-nav" class="nav-bg border-t grid grid-cols-4 gap-2 p-2 hidden">
+        <button data-page="home-page" class="nav-btn flex flex-col items-center p-2 rounded-lg text-primary"><i data-lucide="home" class="w-6 h-6"></i><span data-translate="home" class="text-xs mt-1">Home</span></button>
+        <button data-page="leaderboard-page" class="nav-btn flex flex-col items-center p-2 rounded-lg subtext"><i data-lucide="bar-chart-3" class="w-6 h-6"></i><span data-translate="ranks" class="text-xs mt-1">Ranks</span></button>
+        <button data-page="submissions-page" class="nav-btn flex flex-col items-center p-2 rounded-lg subtext"><i data-lucide="history" class="w-6 h-6"></i><span data-translate="activity" class="text-xs mt-1">Activity</span></button>
+        <button data-page="profile-page" class="nav-btn flex flex-col items-center p-2 rounded-lg subtext"><i data-lucide="user" class="w-6 h-6"></i><span data-translate="profile" class="text-xs mt-1">Profile</span></button>
+      </nav>
+      
+      <div id="toast" class="fixed bottom-20 left-1/2 -translate-x-1/2 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg opacity-0 translate-y-4 transition-all duration-300">Update Successful!</div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        lucide.createIcons();
+        const state = { currentPage: 'splash-page', currentUser: null, userSubmissions: [], currentTest: null, allTests: [{ id: "push-ups", descriptionId: "push-ups_desc" },{ id: "sprint", descriptionId: "sprint_desc" },{ id: "jump-test", descriptionId: "jump-test_desc" },{ id: "plank", descriptionId: "plank_desc" },],xpLevels: [0, 250, 500, 1000], mediaStream: null, selectedFile: null, newProfilePicData: null,};
+        const pages = document.querySelectorAll('.page');
+        const bottomNav = document.getElementById('bottom-nav');
+        const navBtns = document.querySelectorAll('.nav-btn');
+        const loginForm = document.getElementById('login-form');
+        const registerForm = document.getElementById('register-form');
+        const logoutBtn = document.getElementById('logout-btn');
+        const toast = document.getElementById('toast');
+        const refreshStatusBtn = document.getElementById('refresh-status-btn');
+        const editProfileForm = document.getElementById('edit-profile-form');
+        const profilePicUpload = document.getElementById('profile-pic-upload');
+        const editProfilePreview = document.getElementById('edit-profile-preview');
+        const languageSelect = document.getElementById('language-select');
+        const navToRecordBtn = document.getElementById('nav-to-record-btn');
+        const navToUploadBtn = document.getElementById('nav-to-upload-btn');
+        const videoPreview = document.getElementById('video-preview');
+        const cameraPlaceholder = document.getElementById('camera-placeholder');
+        const cameraMessage = document.getElementById('camera-message');
+        const startRecordBtn = document.getElementById('start-record-btn');
+        const stopRecordBtn = document.getElementById('stop-record-btn');
+        const recordingIndicator = document.getElementById('recording-indicator');
+        const submissionControls = document.getElementById('submission-controls');
+        const retakeBtn = document.getElementById('retake-btn');
+        const submitVideoBtn = document.getElementById('submit-video-btn');
+        const uploadBtn = document.getElementById('upload-btn');
+        const fileUploadInput = document.getElementById('file-upload-input');
+        const fileNameEl = document.getElementById('file-name');
+        const submitFileBtn = document.getElementById('submit-file-btn');
+        window.navigateTo = (pageId, recordHistory = true) => {
+            if (state.currentPage === pageId) return;
+            const targetPage = document.getElementById(pageId);
+            if (!targetPage) { console.error(`Page with id ${pageId} not found.`); return; }
+            if (pageId === 'home-page' || pageId === 'profile-page') updateUI();
+            if (pageId === 'submissions-page') renderSubmissions();
+            if (pageId === 'leaderboard-page') changeLeaderboard('district');
+            if (pageId === 'test-selection-page') renderTestList();
+            if (pageId === 'edit-profile-page') populateEditProfileForm();
+            if (pageId === 'record-page' && state.currentTest) {
+                document.getElementById('record-test-title').textContent = state.currentTest.name;
+                startCamera();
+            }
+            if (pageId === 'upload-page' && state.currentTest) {
+                document.getElementById('upload-test-title').textContent = state.currentTest.name;
+            }
+            pages.forEach(p => p.classList.remove('active'));
+            targetPage.classList.add('active');
+            if (recordHistory) { history.pushState({ page: pageId }, '', `#${pageId}`); }
+            state.currentPage = pageId;
+            const showNav = ['home-page', 'leaderboard-page', 'submissions-page', 'profile-page'].includes(pageId);
+            bottomNav.classList.toggle('hidden', !showNav);
+            if (showNav) { navBtns.forEach(btn => { const isTarget = btn.dataset.page === pageId; btn.classList.toggle('text-primary', isTarget); btn.classList.toggle('subtext', !isTarget); }); }
+        };
+        window.onpopstate = (event) => { if (event.state && event.state.page) { navigateTo(event.state.page, false); } else { if (!state.currentUser) navigateTo('auth-page', false); } };
+        navBtns.forEach(btn => { btn.addEventListener('click', () => navigateTo(btn.dataset.page)); });
+        const getFromLocalStorage = (key, defaultValue = null) => { try { const item = localStorage.getItem(key); return item ? JSON.parse(item) : defaultValue; } catch (e) { return defaultValue; } };
+        const saveToLocalStorage = (key, data) => localStorage.setItem(key, JSON.stringify(data));
+        const ALL_USERS_KEY = 'talenttrack_users';
+        const CURRENT_USER_KEY = 'talenttrack_currentUser';
+        const LANGUAGE_KEY = 'talenttrack_language';
+        loginForm.addEventListener('submit', (e) => { e.preventDefault(); const email = document.getElementById('login-email').value.trim().toLowerCase(); const password = document.getElementById('login-password').value.trim(); const users = getFromLocalStorage(ALL_USERS_KEY, {}); const errorEl = document.getElementById('login-error'); if (users[email] && users[email].password === password) { state.currentUser = users[email]; state.userSubmissions = getFromLocalStorage(`submissions_${email}`, []); saveToLocalStorage(CURRENT_USER_KEY, state.currentUser); errorEl.classList.add('hidden'); navigateTo('home-page'); } else { errorEl.textContent = 'Invalid credentials.'; errorEl.classList.remove('hidden'); } });
+        registerForm.addEventListener('submit', (e) => { e.preventDefault(); const firstName = document.getElementById('register-first-name').value.trim(); const lastName = document.getElementById('register-last-name').value.trim(); const age = document.getElementById('register-age').value.trim(); const sport = document.getElementById('register-sport').value.trim(); const email = document.getElementById('register-email').value.trim().toLowerCase(); const password = document.getElementById('register-password').value.trim(); const phone = document.getElementById('register-phone').value.trim(); const aadhar = document.getElementById('register-aadhar').value.trim(); const gender = document.getElementById('register-gender').value; const userState = document.getElementById('register-state').value; const religion = document.getElementById('register-religion').value; const errorEl = document.getElementById('register-error'); if (!firstName || !lastName || !age || !sport || !email || !password || !phone || !aadhar || !gender || !userState || !religion) { errorEl.textContent = 'All fields are required.'; errorEl.classList.remove('hidden'); return; } if (phone.length !== 10 || !/^\d+$/.test(phone)) { errorEl.textContent = 'Please enter a valid 10-digit phone number.'; errorEl.classList.remove('hidden'); return; } if (aadhar.length !== 12 || !/^\d+$/.test(aadhar)) { errorEl.textContent = 'Please enter a valid 12-digit Aadhaar number.'; errorEl.classList.remove('hidden'); return; } let users = getFromLocalStorage(ALL_USERS_KEY, {}); if (users[email]) { errorEl.textContent = 'Email already registered.'; errorEl.classList.remove('hidden'); return; } users[email] = { name: `${firstName} ${lastName}`, firstName, lastName, age, sport, email, password, phone, aadhar, gender, state: userState, religion, xp: 0 }; saveToLocalStorage(ALL_USERS_KEY, users); showToast('Registration successful!', 'success'); navigateTo('login-page'); });
+        logoutBtn.addEventListener('click', () => { state.currentUser = null; localStorage.removeItem(CURRENT_USER_KEY); navigateTo('auth-page'); });
+        const populateEditProfileForm = () => { if (!state.currentUser) return; const user = state.currentUser; document.getElementById('edit-first-name').value = user.firstName || ''; document.getElementById('edit-last-name').value = user.lastName || ''; document.getElementById('edit-age').value = user.age || ''; document.getElementById('edit-sport').value = user.sport || ''; editProfilePreview.src = user.profilePicUrl || `https://placehold.co/96x96/8B5CF6/ffffff?text=${user.name.charAt(0)}`; state.newProfilePicData = null; };
+        profilePicUpload.addEventListener('change', (e) => { const file = e.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = (event) => { state.newProfilePicData = event.target.result; editProfilePreview.src = state.newProfilePicData; }; reader.readAsDataURL(file); });
+        editProfileForm.addEventListener('submit', (e) => { e.preventDefault(); const user = state.currentUser; const firstName = document.getElementById('edit-first-name').value.trim(); const lastName = document.getElementById('edit-last-name').value.trim(); user.firstName = firstName; user.lastName = lastName; user.name = `${firstName} ${lastName}`; user.age = document.getElementById('edit-age').value.trim(); user.sport = document.getElementById('edit-sport').value.trim(); if (state.newProfilePicData) { user.profilePicUrl = state.newProfilePicData; } let allUsers = getFromLocalStorage(ALL_USERS_KEY, {}); allUsers[user.email] = user; saveToLocalStorage(ALL_USERS_KEY, allUsers); saveToLocalStorage(CURRENT_USER_KEY, user); showToast("Profile updated successfully!", "success"); navigateTo('profile-page'); });
+        const updateUI = () => { if (!state.currentUser) return; const user = state.currentUser; const xp = user.xp || 0; const level = Math.floor(xp / 250) + 1; const progress = ((xp % 250) / 250) * 100; const avatarUrl = user.profilePicUrl || `https://placehold.co/48x48/8B5CF6/ffffff?text=${user.name.charAt(0)}`; const largeAvatarUrl = user.profilePicUrl || `https://placehold.co/80x80/8B5CF6/ffffff?text=${user.name.charAt(0)}`; document.getElementById('home-avatar').src = avatarUrl; document.getElementById('home-username').textContent = user.name; document.getElementById('home-xp').textContent = `${xp} XP`; document.getElementById('home-xp-bar').style.width = `${progress}%`; document.getElementById('home-level').textContent = `Level ${level}`; document.getElementById('profile-avatar').src = largeAvatarUrl; document.getElementById('profile-name').textContent = user.name; document.getElementById('profile-details').textContent = `Age ${user.age} | ${user.sport}`; 
+            document.getElementById('badge-bronze').classList.toggle('badge-locked', xp < 100);
+            document.getElementById('badge-silver').classList.toggle('badge-locked', xp < 500);
+            document.getElementById('badge-gold').classList.toggle('badge-locked', xp < 1000);
+            document.getElementById('badge-locked').classList.toggle('badge-locked', xp < 2000);
+            lucide.createIcons();
+        };
+        const renderSubmissions = () => {
+            const listEl = document.getElementById('submission-list');
+            listEl.innerHTML = '';
+            const currentLang = getFromLocalStorage(LANGUAGE_KEY, 'en');
+            const langDict = translations[currentLang];
+            if (state.userSubmissions.length === 0) {
+                listEl.innerHTML = `<p id="no-submissions" class="text-center subtext pt-8">${langDict.no_submissions}</p>`;
+                return;
+            }
+            const statusStyles = { Pending: 'text-yellow-500 bg-yellow-500/20', Approved: 'text-green-500 bg-green-500/20', Rejected: 'text-red-500 bg-red-500/20' };
+            state.userSubmissions.slice().reverse().forEach(sub => {
+                const item = document.createElement('div');
+                item.className = 'surface-bg p-4 rounded-lg cursor-pointer hover:bg-gray-100';
+                item.innerHTML = `<div class="flex justify-between items-center"><p class="font-bold text-light-text">${sub.test}</p><span class="text-xs font-semibold px-2 py-1 rounded-full ${statusStyles[sub.status]}">${sub.status}</span></div><p class="text-sm subtext mt-1">${langDict.score_label}: ${sub.score} | ${langDict.submitted_label}: ${new Date(sub.id).toLocaleDateString()}</p>`;
+                item.addEventListener('click', () => showSubmissionDetails(sub.id));
+                listEl.appendChild(item);
+            });
+        };
+        window.changeLeaderboard = (scope) => {
+            const listEl = document.getElementById('leaderboard-list');
+            if (!listEl) return;
+            listEl.innerHTML = '';
+            document.querySelectorAll('.leaderboard-scope-btn').forEach(b => { if(b) b.classList.remove('active'); });
+            const activeButton = document.querySelector(`.leaderboard-scope-btn[data-scope='${scope}']`);
+            if (activeButton) { activeButton.classList.add('active'); }
+            const users = Object.values(getFromLocalStorage(ALL_USERS_KEY, {})).sort((a,b) => (b.xp || 0) - (a.xp || 0)); 
+            const filteredUsers = users.filter(u => scope === 'national' || (scope === 'state' && u.state === state.currentUser.state) || scope === 'district'); 
+            filteredUsers.forEach((user, index) => { const item = document.createElement('div'); const isCurrentUser = state.currentUser.email === user.email; item.className = `flex items-center gap-4 p-3 rounded-lg ${isCurrentUser ? 'bg-primary/10 border border-primary' : 'surface-bg'}`; item.innerHTML = `<span class="font-bold text-lg w-6 text-light-text">${index + 1}</span><img src="${user.profilePicUrl || `https://placehold.co/40x40/111827/ffffff?text=${user.name.charAt(0)}`}" class="w-10 h-10 rounded-full object-cover"><p class="flex-1 font-semibold text-light-text">${user.name} ${isCurrentUser ? '(You)' : ''}</p><p class="font-bold text-primary">${user.xp || 0} XP</p>`; listEl.appendChild(item); }); 
+        };
+        const renderTestList = () => {
+            const listEl = document.getElementById('test-list');
+            listEl.innerHTML = '';
+            const currentLang = getFromLocalStorage(LANGUAGE_KEY, 'en');
+            state.allTests.forEach(test => {
+                const testName = translations[currentLang][test.id] || test.id;
+                const testDesc = translations[currentLang][test.descriptionId] || '';
+                const item = document.createElement('div');
+                item.className = 'surface-bg p-4 rounded-lg';
+                item.innerHTML = `<div class="flex justify-between items-start"><div><h3 class="font-bold text-lg text-light-text">${testName}</h3><p class="text-sm subtext">${testDesc}</p></div><button data-testid="${test.id}" class="take-test-btn ml-4 bg-primary text-white font-semibold px-4 py-2 rounded-lg text-sm" data-translate="start">Start</button></div>`;
+                listEl.appendChild(item);
+            });
+            document.querySelectorAll('.take-test-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const testId = e.target.dataset.testid;
+                    const currentLang = getFromLocalStorage(LANGUAGE_KEY, 'en');
+                    const testName = translations[currentLang][testId] || testId;
+                    state.currentTest = { ...state.allTests.find(t => t.id === testId), name: testName };
+                    document.getElementById('upload-record-title').textContent = testName;
+                    navigateTo('upload-or-record-page');
+                });
+            });
+            setLanguage(currentLang);
+        };
+        const showSubmissionDetails = (submissionId) => {
+            const submission = state.userSubmissions.find(s => s.id === submissionId);
+            if (!submission) return;
+            const statusStyles = { Pending: 'text-yellow-500 bg-yellow-500/20', Approved: 'text-green-500 bg-green-500/20', Rejected: 'text-red-500 bg-red-500/20' };
+            document.getElementById('detail-test-name').textContent = submission.test;
+            document.getElementById('detail-status').textContent = submission.status;
+            document.getElementById('detail-status').className = `text-xs font-semibold px-2 py-1 rounded-full ${statusStyles[submission.status]}`;
+            document.getElementById('detail-score').textContent = submission.score;
+            document.getElementById('detail-xp').textContent = `+${submission.xpEarned} XP`;
+            document.getElementById('detail-feedback').textContent = submission.feedback || 'Awaiting review.';
+            navigateTo('submission-detail-page');
+        };
+        navToRecordBtn.addEventListener('click', () => { navigateTo('record-page'); });
+        navToUploadBtn.addEventListener('click', () => { navigateTo('upload-page'); });
+        const startCamera = async () => { videoPreview.classList.add('hidden'); cameraPlaceholder.classList.remove('hidden'); cameraMessage.textContent = 'Requesting camera access...'; lucide.createIcons(); try { if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { throw new Error('Camera API not available.'); } state.mediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false }); videoPreview.srcObject = state.mediaStream; cameraPlaceholder.classList.add('hidden'); videoPreview.classList.remove('hidden'); } catch (error) { console.error("Error accessing camera: ", error); cameraMessage.textContent = `Camera access denied. Please enable camera permissions.`; } };
+        const stopCamera = () => { if (state.mediaStream) { state.mediaStream.getTracks().forEach(track => track.stop()); state.mediaStream = null; videoPreview.srcObject = null; } };
+        window.handleBackFromTest = () => { stopCamera(); history.back(); };
+        window.handleSkipTest = () => { stopCamera(); navigateTo('home-page'); };
+        const resetRecorderState = () => { videoPreview.play(); startRecordBtn.classList.remove('hidden'); stopRecordBtn.classList.add('hidden'); recordingIndicator.classList.add('hidden'); submissionControls.classList.add('hidden'); document.getElementById('recorder-controls').classList.remove('hidden'); };
+        startRecordBtn.addEventListener('click', () => { startRecordBtn.classList.add('hidden'); stopRecordBtn.classList.remove('hidden'); recordingIndicator.classList.remove('hidden'); });
+        stopRecordBtn.addEventListener('click', () => { stopRecordBtn.classList.add('hidden'); document.getElementById('recorder-controls').classList.add('hidden'); submissionControls.classList.remove('hidden'); recordingIndicator.classList.add('hidden'); videoPreview.pause(); });
+        retakeBtn.addEventListener('click', resetRecorderState);
+        submitVideoBtn.addEventListener('click', submitTest);
+        uploadBtn.addEventListener('click', () => fileUploadInput.click());
+        fileUploadInput.addEventListener('change', (e) => { state.selectedFile = e.target.files[0]; if(state.selectedFile) { fileNameEl.textContent = state.selectedFile.name; submitFileBtn.disabled = false; } });
+        submitFileBtn.addEventListener('click', () => { if(state.selectedFile) submitTest(); });
+        function submitTest() { const score = Math.floor(Math.random() * 101); const xpEarned = Math.floor(score / 2); const submission = { id: Date.now(), test: state.currentTest.name, score, xpEarned, status: 'Pending', xpAwarded: false, feedback: 'Your submission is under review by our AI and coaching staff.' }; state.userSubmissions.push(submission); saveToLocalStorage(`submissions_${state.currentUser.email}`, state.userSubmissions); showToast('Submission Sent for Review!', 'info'); setTimeout(() => { stopCamera(); resetRecorderState(); fileUploadInput.value = ''; fileNameEl.textContent = ''; submitFileBtn.disabled = true; navigateTo('submissions-page'); }, 1000); };
+        refreshStatusBtn.addEventListener('click', () => {
+            const icon = refreshStatusBtn.querySelector('svg');
+            if (!icon) return;
+            icon.classList.add('animate-spin');
+            setTimeout(() => {
+                let changesMade = false;
+                const rejectionReasons = ["Video was too dark.", "Test not performed correctly.", "Full body not visible.", "Unstable camera movement."];
+                const approvalFeedback = ["Excellent form!", "Great power output.", "Solid performance.", "Good technique displayed."];
+                state.userSubmissions.forEach(sub => { 
+                    if (sub.status === 'Pending' && Math.random() > 0.2) { 
+                        changesMade = true; 
+                        const isApproved = Math.random() > 0.3; 
+                        sub.status = isApproved ? 'Approved' : 'Rejected'; 
+                        sub.feedback = isApproved ? approvalFeedback[Math.floor(Math.random() * approvalFeedback.length)] : rejectionReasons[Math.floor(Math.random() * rejectionReasons.length)]; 
+                    } 
+                });
+                if (changesMade) {
+                    let xpGained = 0;
+                    let allUsers = getFromLocalStorage(ALL_USERS_KEY, {});
+                    state.userSubmissions.forEach(sub => { if (sub.status === 'Approved' && !sub.xpAwarded) { xpGained += sub.xpEarned; sub.xpAwarded = true; } });
+                    if (xpGained > 0) { allUsers[state.currentUser.email].xp = (allUsers[state.currentUser.email].xp || 0) + xpGained; state.currentUser.xp = allUsers[state.currentUser.email].xp; saveToLocalStorage(ALL_USERS_KEY, allUsers); saveToLocalStorage(CURRENT_USER_KEY, state.currentUser); }
+                    saveToLocalStorage(`submissions_${state.currentUser.email}`, state.userSubmissions);
+                    renderSubmissions();
+                    updateUI();
+                    showToast('Statuses Updated!', 'success');
+                } else {
+                    showToast('No new updates.', 'info');
+                }
+                icon.classList.remove('animate-spin');
+            }, 1000);
+        });
+        const showToast = (message, type = 'success') => {
+            toast.textContent = message;
+            toast.classList.remove('bg-green-500', 'bg-red-500', 'bg-blue-500');
+            if (type === 'error') toast.classList.add('bg-red-500');
+            else if (type === 'info') toast.classList.add('bg-blue-500');
+            else toast.classList.add('bg-green-500');
+            toast.classList.remove('opacity-0', 'translate-y-4');
+            setTimeout(() => { toast.classList.add('opacity-0', 'translate-y-4'); }, 2500);
+        };
+        const initializeMockData = () => { const users = getFromLocalStorage(ALL_USERS_KEY); if (!users || Object.keys(users).length === 0) { const mockUsers = { 'athlete@talenttrack.com': { name: 'Alex Ray', firstName: 'Alex', lastName: 'Ray', age: 22, sport: 'Basketball', email: 'athlete@talenttrack.com', password: 'password', phone: '9876543210', aadhar: '123456789012', gender: 'Male', state: 'Haryana', religion: 'Other', xp: 350 } }; saveToLocalStorage(ALL_USERS_KEY, mockUsers); } };
+        const translations = {
+            en: {
+                app_title: "TalentTrack", app_subtitle: "Find Your Edge.", get_started_title: "Get Started", get_started_subtitle: "Join the next generation of athletes.",
+                login: "Login", register: "Register", back: "Back", login_title: "Welcome Back", login_subtitle: "Log in to continue your journey.", email: "Email", password: "Password",
+                register_title: "Create Account", register_subtitle: "Join the community of athletes.", first_name: "First Name", last_name: "Last Name", phone: "Phone Number (10 digits)",
+                aadhar: "Aadhaar Number (12 digits)", age: "Age", select_gender: "Select Gender", male: "Male", female: "Female", other: "Other", primary_sport: "Primary Sport",
+                select_state: "Select State", select_religion: "Select Religion", welcome_back: "Welcome back,", current_xp: "Your Current XP", start_test: "Start Test",
+                missions: "Missions", events: "Events", info: "Info", select_test: "Select a Test", select_test_subtitle: "Choose a test to record or upload your performance.", start: "Start",
+                submit_performance_subtitle: "Choose how to submit your video for the test.", record_video: "Record Video", upload_device: "Upload from Device", skip: "Skip",
+                record: "Record", upload: "Upload", stop: "Stop", retake: "Retake", submit: "Submit", choose_file: "Choose File", submit_file: "Submit File", activity: "Activity",
+                activity_subtitle: "Review the status of your submitted tests.", no_submissions: "No submissions yet.", leaderboard: "Leaderboard", district: "District", state: "State",
+                national: "National", badges: "Badges", rookie: "Rookie", elite: "Elite", legend: "Legend", top_tier: "Top Tier", edit_profile: "Edit Profile",
+                edit_profile_subtitle: "Update your personal information.", save_changes: "Save Changes", settings: "Settings", settings_subtitle: "Personalize your experience.",
+                language: "Language", account: "Account", logout: "Logout",
+                missions_subtitle: "Complete challenges for extra XP!", mission1_title: "Speed Demon", mission1_desc: "Complete one 40m Sprint test today.", mission1_reward: "Reward: 50 XP", go: "Go!",
+                events_subtitle: "Find official SAI events near you.", event1_title: "Khelo India Youth Games", event1_details: "Date: 15 Oct 2025 | Location: Chennai, TN", event2_title: "National Athletics Trials", event2_details: "Date: 05 Nov 2025 | Location: Patiala, PB",
+                info_subtitle: "About the app and policies.", about_app: "About TalentTrack", about_app_desc: "This app is an official tool by the Sports Authority of India (SAI) to democratize talent identification using modern technology.",
+                fair_play: "Fair Play Policy", fair_play1: "All submitted videos must be authentic, unedited performances.", fair_play2: "Our AI uses cheat detection to ensure fair assessments.", fair_play3: "Please perform tests in a safe, clear environment.",
+                requesting_camera: "Requesting camera access...", home: "Home", ranks: "Ranks", profile: "Profile",
+                "push-ups": "Push-ups", "sprint": "40m Sprint", "jump-test": "Vertical Jump", "plank": "Plank",
+                "push-ups_desc": "Record your max push-ups in 60 seconds.", "sprint_desc": "Test your maximum speed and acceleration.", "jump-test_desc": "Measure your explosive leaping ability.", "plank_desc": "Hold a plank for as long as you can.",
+                upload_subtitle: "Select a video file from your device.", submission_details_subtitle: "Detailed feedback on your performance.", status: "Status", score: "Score", xp_earned: "XP Earned", feedback: "Feedback", score_label: "Score", submitted_label: "Submitted"
+            },
+            ta: {
+                app_title: "டேலன்ட் ட்ராக்", app_subtitle: "உங்கள் திறமையை கண்டறியுங்கள்.", get_started_title: "தொடங்கவும்", get_started_subtitle: "அடுத்த தலைமுறை விளையாட்டு வீரர்களுடன் சேருங்கள்.",
+                login: "உள்நுழை", register: "பதிவு செய்", back: "பின்னால்", login_title: "மீண்டும் வருக", login_subtitle: "உங்கள் பயணத்தைத் தொடர உள்நுழையவும்.", email: "மின்னஞ்சல்", password: "கடவுச்சொல்",
+                register_title: "கணக்கை உருவாக்கு", register_subtitle: "விளையாட்டு வீரர்களின் சமூகத்தில் சேரவும்.", first_name: "முதல் பெயர்", last_name: "கடைசி பெயர்", phone: "தொலைபேசி எண் (10 இலக்கங்கள்)",
+                aadhar: "ஆதார் எண் (12 இலக்கங்கள்)", age: "வயது", select_gender: "பாலினத்தைத் தேர்ந்தெடுக்கவும்", male: "ஆண்", female: "பெண்", other: "மற்றவை", primary_sport: "முதன்மை விளையாட்டு",
+                select_state: "மாநிலத்தைத் தேர்ந்தெடுக்கவும்", select_religion: "மதத்தைத் தேர்ந்தெடுக்கவும்", welcome_back: "மீண்டும் வருக,", current_xp: "உங்கள் தற்போதைய XP", start_test: "சோதனையைத் தொடங்கு",
+                missions: "பணிகள்", events: "நிகழ்வுகள்", info: "தகவல்", select_test: "ஒரு சோதனையைத் தேர்ந்தெடுக்கவும்", select_test_subtitle: "உங்கள் செயல்திறனைப் பதிவு செய்ய அல்லது பதிவேற்ற ஒரு சோதனையைத் தேர்வுசெய்க.", start: "தொடங்கு",
+                submit_performance_subtitle: "சோதனைக்கு உங்கள் வீடியோவை எவ்வாறு சமர்ப்பிப்பது என்பதைத் தேர்வுசெய்க.", record_video: "வீடியோ பதிவு செய்", upload_device: "சாதனத்திலிருந்து பதிவேற்று", skip: "தவிர்",
+                record: "பதிவு", upload: "பதிவேற்று", stop: "நிறுத்து", retake: "மீண்டும் எடு", submit: "சமர்ப்பி", choose_file: "கோப்பைத் தேர்ந்தெடு", submit_file: "கோப்பை சமர்ப்பி", activity: "செயல்பாடு",
+                activity_subtitle: "உங்கள் சமர்ப்பிக்கப்பட்ட சோதனைகளின் நிலையை மதிப்பாய்வு செய்யவும்.", no_submissions: "இன்னும் சமர்ப்பிப்புகள் இல்லை.", leaderboard: "லீடர்போர்டு", district: "மாவட்டம்", state: "மாநிலம்",
+                national: "தேசிய", badges: "பேட்ஜ்கள்", rookie: "ரூக்கி", elite: "எலைட்", legend: "லெஜண்ட்", top_tier: "உயர் அடுக்கு", edit_profile: "சுயவிவரத்தைத் திருத்து",
+                edit_profile_subtitle: "உங்கள் தனிப்பட்ட தகவலைப் புதுப்பிக்கவும்.", save_changes: "மாற்றங்களை சேமி", settings: "அமைப்புகள்", settings_subtitle: "உங்கள் அனுபவத்தைத் தனிப்பயனாக்குங்கள்.",
+                language: "மொழி", account: "கணக்கு", logout: "வெளியேறு",
+                missions_subtitle: "கூடுதல் XP-க்கு சவால்களை முடிக்கவும்!", mission1_title: "வேக அரக்கன்", mission1_desc: "இன்று ஒரு 40மீ ஸ்பிரிண்ட் சோதனையை முடிக்கவும்.", mission1_reward: "வெகுமதி: 50 XP", go: "செல்!",
+                events_subtitle: "உங்களுக்கு அருகிலுள்ள அதிகாரப்பூர்வ SAI நிகழ்வுகளைக் கண்டறியவும்.", event1_title: "கேலோ இந்தியா இளைஞர் விளையாட்டு", event1_details: "தேதி: 15 அக் 2025 | இடம்: சென்னை, TN", event2_title: "தேசிய தடகள சோதனைகள்", event2_details: "தேதி: 05 நவ 2025 | இடம்: பாட்டியாலா, PB",
+                info_subtitle: "பயன்பாடு மற்றும் கொள்கைகள் பற்றி.", about_app: "டேலன்ட் ட்ராக் பற்றி", about_app_desc: "இந்த பயன்பாடு, நவீன தொழில்நுட்பத்தைப் பயன்படுத்தி திறமை அடையாளத்தை ஜனநாயகப்படுத்துவதற்கான இந்திய விளையாட்டு ஆணையத்தின் (SAI) அதிகாரப்பூர்வ கருவியாகும்.",
+                fair_play: "நியாயமான விளையாட்டு கொள்கை", fair_play1: "சமர்ப்பிக்கப்பட்ட அனைத்து வீடியோக்களும் உண்மையான, திருத்தப்படாத நிகழ்ச்சிகளாக இருக்க வேண்டும்.", fair_play2: "எங்கள் AI நியாயமான மதிப்பீடுகளை உறுதிப்படுத்த ஏமாற்று கண்டறிதலைப் பயன்படுத்துகிறது.", fair_play3: "தயவுசெய்து சோதனைகளை பாதுகாப்பான, தெளிவான சூழலில் செய்யவும்.",
+                requesting_camera: "கேமரா அணுகல் கோரப்படுகிறது...", home: "முகப்பு", ranks: "தரவரிசை", profile: "சுயவிவரம்",
+                "push-ups": "புஷ்-அப்கள்", "sprint": "40மீ ஓட்டம்", "jump-test": "செங்குத்து ஜம்ப்", "plank": "பிளாங்க்",
+                "push-ups_desc": "60 வினாடிகளில் உங்கள் அதிகபட்ச புஷ்-அப்களைப் பதிவு செய்யுங்கள்.", "sprint_desc": "உங்கள் அதிகபட்ச வேகம் மற்றும் முடுக்கம் சோதிக்கவும்.", "jump-test_desc": "உங்கள் வெடிக்கும் பாய்ச்சல் திறனை அளவிடவும்.", "plank_desc": "உங்களால் முடிந்தவரை ஒரு பிளாங்கை வைத்திருங்கள்.",
+                upload_subtitle: "உங்கள் சாதனத்திலிருந்து ஒரு வீடியோ கோப்பைத் தேர்ந்தெடுக்கவும்.", submission_details_subtitle: "உங்கள் செயல்திறன் குறித்த விரிவான கருத்து.", status: "நிலை", score: "மதிப்பெண்", xp_earned: "பெறப்பட்ட XP", feedback: "கருத்து", score_label: "மதிப்பெண்", submitted_label: "சமர்ப்பிக்கப்பட்டது"
+            },
+            hi: {
+                app_title: "टैलेंटट्रैक", app_subtitle: "अपना किनारा ढूंढो।", get_started_title: "शुरू हो जाओ", get_started_subtitle: "एथलीटों की अगली पीढ़ी में शामिल हों।",
+                login: "लॉग इन करें", register: "पंजीकरण करवाना", back: "वापस", login_title: "वापसी पर स्वागत है", login_subtitle: "अपनी यात्रा जारी रखने के लिए लॉग इन करें।", email: "ईमेल", password: "पासवर्ड",
+                register_title: "खाता बनाएं", register_subtitle: "एथलीटों के समुदाय में शामिल हों।", first_name: "पहला नाम", last_name: "अंतिम নাম", phone: "फोन नंबर (10 अंक)",
+                aadhar: "आधार संख्या (12 अंक)", age: "आयु", select_gender: "लिंग चुनें", male: "पुरुष", female: "महिला", other: "अन्य", primary_sport: "प्राथमिक खेल",
+                select_state: "राज्य चुनें", select_religion: "धर्म चुनें", welcome_back: "वापसी पर स्वागत है,", current_xp: "आपका वर्तमान XP", start_test: "परीक्षण शुरू करें",
+                missions: "मिशन", events: "आयोजन", info: "जानकारी", select_test: "एक परीक्षण चुनें", select_test_subtitle: "अपना प्रदर्शन रिकॉर्ड करने या अपलोड करने के लिए एक परीक्षण चुनें।", start: "शुरू",
+                submit_performance_subtitle: "परीक्षण के लिए अपना वीडियो कैसे सबमिट करें चुनें।", record_video: "वीडियो रिकॉर्ड करें", upload_device: "डिवाइस से अपलोड करें", skip: "छोड़ें",
+                record: "रिकॉर्ड", upload: "अपलोड", stop: "रोकें", retake: "पुनः प्रयास करें", submit: "प्रस्तुत", choose_file: "फ़ाइल चुनें", submit_file: "फ़ाइल जमा करें", activity: "गतिविधि",
+                activity_subtitle: "अपने सबमिट किए गए परीक्षणों की स्थिति की समीक्षा करें।", no_submissions: "अभी तक कोई सबमिशन नहीं है।", leaderboard: "लीडरबोर्ड", district: "ज़िला", state: "राज्य",
+                national: "राष्ट्रीय", badges: "बैज", rookie: "रookie", elite: "एलीट", legend: "लीजेंड", top_tier: "शीर्ष स्तर", edit_profile: "प्रोफ़ाइल संपादित करें",
+                edit_profile_subtitle: "अपनी व्यक्तिगत जानकारी अपडेट करें।", save_changes: "परिवर्तनों को सुरक्षित करें", settings: "समायोजन", settings_subtitle: "अपने अनुभव को निजीकृत करें।",
+                language: "भाषा", account: "खाता", logout: "लॉग आउट",
+                missions_subtitle: "अतिरिक्त XP के लिए चुनौतियाँ पूरी करें!", mission1_title: "स्पीड दानव", mission1_desc: "आज एक 40 मीटर स्प्रिंट परीक्षण पूरा करें।", mission1_reward: "इनाम: 50 XP", go: "जाओ!",
+                events_subtitle: "अपने आस-पास आधिकारिक SAI कार्यक्रम खोजें।", event1_title: "खेलो इंडिया यूथ गेम्स", event1_details: "तिथि: 15 अक्टूबर 2025 | स्थान: चेन्नई, TN", event2_title: "राष्ट्रीय एथलेटिक्स ट्रायल", event2_details: "तिथि: 05 नवंबर 2025 | स्थान: पटियाला, PB",
+                info_subtitle: "ऐप और नीतियों के बारे में।", about_app: "टैलेंटट्रैक के बारे में", about_app_desc: "यह ऐप आधुनिक तकनीक का उपयोग करके प्रतिभा पहचान को लोकतांत्रिक बनाने के लिए भारतीय खेल प्राधिकरण (SAI) द्वारा एक आधिकारिक उपकरण है।",
+                fair_play: "निष्पक्ष खेल नीति", fair_play1: "सभी सबमिट किए गए வீடியோ प्रामाणिक, असंपादित प्रदर्शन होने चाहिए।", fair_play2: "हमारा AI निष्पक्ष मूल्यांकन सुनिश्चित करने के लिए धोखाधड़ी का पता लगाने का उपयोग करता है।", fair_play3: "कृपया सुरक्षित, स्पष्ट वातावरण में परीक्षण करें।",
+                requesting_camera: "कैमरा एक्सेस का अनुरोध किया जा रहा है...", home: "घर", ranks: "रैंक", profile: "प्रोफ़ाइल",
+                "push-ups": "पुश-अप", "sprint": "40 मीटर स्प्रिंट", "jump-test": "वर्टिकल जंप", "plank": "प्लैंक",
+                "push-ups_desc": "60 सेकंड में अपने अधिकतम पुश-अप रिकॉर्ड करें।", "sprint_desc": "अपनी अधिकतम गति और त्वरण का परीक्षण करें।", "jump-test_desc": "अपनी विस्फोटक छलांग क्षमता को मापें।", "plank_desc": "जितनी देर हो सके प्लैंक पकड़ें।",
+                upload_subtitle: "अपने डिवाइस से एक वीडियो फ़ाइल चुनें।", submission_details_subtitle: "आपके प्रदर्शन पर विस्तृत प्रतिक्रिया।", status: "स्थिति", score: "स्कोर", xp_earned: "XP अर्जित", feedback: "प्रतिक्रिया", score_label: "स्कोर", submitted_label: "जमा किया गया"
+            }
+        };
+
+        const setLanguage = (lang) => {
+            if (!translations[lang]) return;
+            document.querySelectorAll('[data-translate]').forEach(el => {
+                const key = el.dataset.translate;
+                el.textContent = translations[lang][key] || el.textContent;
+            });
+             document.querySelectorAll('[data-translate-placeholder]').forEach(el => {
+                const key = el.dataset.translatePlaceholder;
+                el.placeholder = translations[lang][key] || el.placeholder;
+            });
+            languageSelect.value = lang;
+            saveToLocalStorage(LANGUAGE_KEY, lang);
+        };
+        languageSelect.addEventListener('change', (e) => {
+            setLanguage(e.target.value);
+            if (state.currentPage === 'test-selection-page') renderTestList();
+            if (state.currentPage === 'submissions-page') renderSubmissions();
+        });
+        
+        document.querySelectorAll('.leaderboard-scope-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const scope = e.currentTarget.dataset.scope;
+                changeLeaderboard(scope);
+            });
+        });
+
+        const init = () => { 
+            const savedLang = getFromLocalStorage(LANGUAGE_KEY, 'en');
+            setLanguage(savedLang);
+            initializeMockData(); 
+            const loggedInUser = getFromLocalStorage(CURRENT_USER_KEY); 
+            setTimeout(() => { if (loggedInUser) { state.currentUser = loggedInUser; state.userSubmissions = getFromLocalStorage(`submissions_${loggedInUser.email}`, []); const initialPage = window.location.hash.substring(1) || 'home-page'; navigateTo(initialPage, false); } else { navigateTo('auth-page', false); } history.replaceState({ page: state.currentPage }, '', `#${state.currentPage}`); }, 1500); 
+        };
+        init();
+    });
+    </script>
+</body>
+</html>
