@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#F3F4F6">
+    <title>TalentTrack Pro</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&family=Noto+Sans+Tamil:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://unpkg.com/lucide@0.395.0/dist/umd/lucide.js"></script>
+
+    <link rel="stylesheet" href="style.css">
+    
+    <script>
+      // Customizing Tailwind theme with the TalentTrack color palette
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Noto Sans', 'Noto Sans Devanagari', 'Noto Sans Tamil', 'sans-serif'],
+            },
+            colors: {
+              primary: {
+                DEFAULT: '#8B5CF6', // violet-500
+                '50': '#F5F3FF',
+                '100': '#EDE9FE',
+                '200': '#DDD6FE',
+                '300': '#C4B5FD',
+                '400': '#A78BFA',
+                '500': '#8B5CF6',
+                '600': '#7C3AED',
+                '700': '#6D28D9',
+                '800': '#5B21B6',
+                '900': '#4C1D95',
+                '950': '#2F0865',
+              },
+            },
+          }
+        }
+      }
+    </script>
+    
+    <style>
+        /* Base styles for the mobile app simulation */
+        body {
+            /* Using the background color defined for the app structure */
+            background-color: #F3F4F6; /* grey-100 */
+        }
+        #app-container {
+            /* Simulates a mobile screen on larger devices */
+            max-width: 420px;
+            height: 100dvh;
+            margin: 0 auto;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            background-color: #ffffff;
+        }
+        .page {
+            display: none;
+            height: 100%;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .page.active {
+            display: block;
+        }
+        /* Hide scrollbar for a cleaner mobile app look */
+        .page::-webkit-scrollbar {
+            display: none;
+        }
+        .page {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+        .tab-btn.active {
+            color: #8B5CF6;
+            border-bottom: 2px solid #8B5CF6;
+        }
+        /* Custom classes for the activity/submission list */
+        .submission-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .submission-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.06);
+        }
+
+    </style>
+</head>
+<body>
+    <div id="app-container" class="relative">
+        
+        <div id="splash-page" class="page active flex flex-col justify-center items-center bg-primary-600 text-white transition-opacity duration-1000 ease-out z-50 fixed inset-0">
+            <svg data-lucide="dumbbell" class="w-20 h-20 mb-4"></svg>
+            <h1 class="text-4xl font-bold tracking-wider">TalentTrack</h1>
+            <p class="text-lg mt-2 font-medium">Pro</p>
+        </div>
+
+        <div id="auth-page" class="page bg-gray-50 flex flex-col pt-16 hidden">
+            <div class="px-6 text-center">
+                <svg data-lucide="dumbbell" class="w-12 h-12 mx-auto text-primary-600 mb-2"></svg>
+                <h1 data-translate="auth-welcome" class="text-3xl font-bold text-gray-800">Welcome Athlete</h1>
+                <p data-translate="auth-subtitle" class="text-gray-500 mt-2">Log in or Register to begin your journey.</p>
+            </div>
+            
+            <div class="flex-grow flex flex-col justify-center p-6 space-y-4">
+                
+                <div id="login-form" class="space-y-4">
+                    <input data-translate-placeholder="email-placeholder" type="email" id="login-email" placeholder="Email" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500">
+                    <input data-translate-placeholder="password-placeholder" type="password" id="login-password" placeholder="Password" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500">
+                    <p id="login-error" class="text-sm text-red-500"></p>
+                    <button data-translate="login-btn" onclick="handleLogin()" class="w-full bg-primary-600 text-white p-3 rounded-lg font-semibold hover:bg-primary-700 transition duration-150">Login</button>
+                </div>
+                
+                <div id="register-form" class="space-y-3 hidden">
+                    <input data-translate-placeholder="name-placeholder" type="text" id="register-name" placeholder="Full Name" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500">
+                    <input data-translate-placeholder="email-placeholder" type="email" id="register-email" placeholder="Email" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500">
+                    <input data-translate-placeholder="password-placeholder" type="password" id="register-password" placeholder="Password" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500">
+                    <input data-translate-placeholder="age-placeholder" type="number" id="register-age" placeholder="Age" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500">
+                    <input data-translate-placeholder="aadhaar-placeholder" type="text" id="register-aadhaar" placeholder="Aadhaar Number (Last 4 Digits)" maxlength="4" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500">
+                    <input data-translate-placeholder="phone-placeholder" type="tel" id="register-phone" placeholder="Phone Number" maxlength="10" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500">
+                    
+                    <select data-translate-placeholder="sport-placeholder" id="register-sport" class="w-full p-3 border border-gray-300 rounded-lg bg-white focus:ring-primary-500 focus:border-primary-500">
+                        <option value="" disabled selected data-translate="sport-placeholder">Select Primary Sport</option>
+                        <option value="athletics" data-translate="sport-athletics">Athletics</option>
+                        <option value="swimming" data-translate="sport-swimming">Swimming</option>
+                        <option value="archery" data-translate="sport-archery">Archery</option>
+                        <option value="boxing" data-translate="sport-boxing">Boxing</option>
+                        <option value="football" data-translate="sport-football">Football</option>
+                        <option value="basketball" data-translate="sport-basketball">Basketball</option>
+                    </select>
+
+                    <select data-translate-placeholder="state-placeholder" id="register-state" class="w-full p-3 border border-gray-300 rounded-lg bg-white focus:ring-primary-500 focus:border-primary-500">
+                        <option value="" disabled selected data-translate="state-placeholder">Select State</option>
+                        <option value="tamil-nadu">Tamil Nadu</option>
+                        <option value="maharashtra">Maharashtra</option>
+                        <option value="uttar-pradesh">Uttar Pradesh</option>
+                        <option value="haryana">Haryana</option>
+                        <option value="kerala">Kerala</option>
+                    </select>
+
+                    <select data-translate-placeholder="religion-placeholder" id="register-religion" class="w-full p-3 border border-gray-300 rounded-lg bg-white focus:ring-primary-500 focus:border-primary-500">
+                        <option value="" disabled selected data-translate="religion-placeholder">Select Religion</option>
+                        <option value="hinduism">Hinduism</option>
+                        <option value="islam">Islam</option>
+                        <option value="christianity">Christianity</option>
+                        <option value="sikhism">Sikhism</option>
+                        <option value="buddhism">Buddhism</option>
+                    </select>
+                    
+                    <p id="register-error" class="text-sm text-red-500"></p>
+                    <button data-translate="register-btn" onclick="handleRegister()" class="w-full bg-primary-600 text-white p-3 rounded-lg font-semibold hover:bg-primary-700 transition duration-150">Register</button>
+                </div>
+
+                <button id="toggle-auth-btn" data-translate="toggle-register" onclick="toggleAuthMode()" class="text-primary-600 mt-4 text-sm font-semibold hover:text-primary-800 transition duration-150">Don't have an account? Register</button>
+            </div>
+            
+            <div class="p-6">
+                <select id="language-select-auth" class="w-full p-2 border border-gray-300 rounded-lg bg-white text-sm" onchange="setLanguage(this.value)">
+                    <option value="en">English</option>
+                    <option value="ta">தமிழ் (Tamil)</option>
+                    <option value="hi">हिंदी (Hindi)</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="main-content" class="h-full flex flex-col hidden">
+            
+            <div class="flex-grow overflow-y-auto pb-20">
+
+                <div id="home-page" class="page active pt-6 px-4">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-2xl font-bold text-gray-800">
+                            <span data-translate="home-welcome">Welcome back,</span> <span id="home-username" class="text-primary-600"></span>!
+                        </h2>
+                        <button onclick="navigateTo('profile-page')" class="bg-gray-200 p-2 rounded-full hover:bg-gray-300 transition">
+                            <svg data-lucide="user" class="w-6 h-6 text-gray-700"></svg>
+                        </button>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-xl shadow-lg mb-6">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 data-translate="xp-title" class="text-lg font-semibold text-gray-700">Experience Points (XP)</h3>
+                            <span id="current-xp" class="text-2xl font-bold text-primary-600">0</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2.5 mb-2">
+                            <div id="xp-progress-bar" class="bg-primary-500 h-2.5 rounded-full" style="width: 0%"></div>
+                        </div>
+                        <div class="flex justify-between text-sm text-gray-500">
+                            <span id="current-level">Level 1</span>
+                            <span id="xp-to-next-level">0/100 XP to Level 2</span>
+                        </div>
+                    </div>
+
+                    <div class="mb-8">
+                        <button data-translate="start-test-btn" onclick="navigateTo('test-selection-page')" class="w-full bg-primary-600 text-white p-4 rounded-xl shadow-lg shadow-primary-300 text-lg font-bold flex items-center justify-center space-x-2 hover:bg-primary-700 transition duration-150">
+                            <svg data-lucide="plus-circle" class="w-6 h-6"></svg>
+                            <span>Start New Test</span>
+                        </button>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-xl shadow-lg mb-6">
+                        <h3 data-translate="missions-title" class="text-lg font-bold text-gray-800 mb-3 flex items-center">
+                            <svg data-lucide="target" class="w-5 h-5 mr-2 text-primary-500"></svg>
+                            Daily Missions
+                        </h3>
+                        <div id="missions-list" class="space-y-2">
+                            <div class="bg-primary-50 p-3 rounded-lg flex items-center justify-between">
+                                <div>
+                                    <p data-translate="mission-speed" class="font-medium text-gray-700">Speed Demon: Complete one 40m Sprint test today.</p>
+                                    <p class="text-sm text-primary-600 font-semibold">+50 XP</p>
+                                </div>
+                                <svg data-lucide="check-circle" class="w-6 h-6 text-green-500"></svg>
+                            </div>
+                            <div class="bg-gray-100 p-3 rounded-lg flex items-center justify-between opacity-50">
+                                <div>
+                                    <p data-translate="mission-plank" class="font-medium text-gray-700">Iron Core: Achieve a plank time of 120 seconds or more.</p>
+                                    <p class="text-sm text-primary-600 font-semibold">+100 XP</p>
+                                </div>
+                                <svg data-lucide="circle" class="w-6 h-6 text-gray-400"></svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="submissions-page" class="page pt-6 px-4">
+                    <h2 data-translate="activity-title" class="text-2xl font-bold text-gray-800 mb-6">Activity & Submissions</h2>
+                    
+                    <button data-translate="refresh-btn" id="refreshStatusBtn" class="w-full bg-gray-200 text-gray-700 p-3 rounded-lg font-semibold mb-4 flex items-center justify-center space-x-2 hover:bg-gray-300 transition duration-150">
+                        <svg data-lucide="rotate-cw" class="w-4 h-4"></svg>
+                        <span>Refresh Status</span>
+                    </button>
+
+                    <div id="submissions-list" class="space-y-4">
+                        <div class="bg-white p-4 rounded-xl shadow-md submission-card">
+                            <div class="flex items-center justify-between">
+                                <span class="font-semibold text-lg text-gray-800">40m Sprint</span>
+                                <span class="text-sm font-semibold text-yellow-600 bg-yellow-100 px-3 py-1 rounded-full">PENDING</span>
+                            </div>
+                            <p class="text-sm text-gray-500 mt-1">Submitted on: 2024-05-15</p>
+                            <p class="text-sm text-gray-500">Score: N/A</p>
+                        </div>
+                    </div>
+                    <p id="no-submissions" data-translate="no-activity" class="text-center text-gray-500 py-10 hidden">No activity recorded yet.</p>
+                </div>
+
+                <div id="leaderboard-page" class="page pt-6 px-4">
+                    <h2 data-translate="leaderboard-title" class="text-2xl font-bold text-gray-800 mb-6">Leaderboard</h2>
+
+                    <div class="flex justify-around bg-white p-1 rounded-xl shadow-sm mb-6">
+                        <button data-translate="leaderboard-district" data-scope="district" class="leaderboard-scope-btn tab-btn active flex-1 p-2 text-sm font-medium text-gray-600 transition">District</button>
+                        <button data-translate="leaderboard-state" data-scope="state" class="leaderboard-scope-btn tab-btn flex-1 p-2 text-sm font-medium text-gray-600 transition">State</button>
+                        <button data-translate="leaderboard-national" data-scope="national" class="leaderboard-scope-btn tab-btn flex-1 p-2 text-sm font-medium text-gray-600 transition">National</button>
+                    </div>
+
+                    <div class="bg-primary-100 p-4 rounded-xl shadow-lg border-2 border-primary-500 mb-6 flex items-center justify-between">
+                        <div class="flex items-center">
+                            <span id="my-rank" class="text-2xl font-extrabold text-primary-700 mr-4">#0</span>
+                            <div>
+                                <p data-translate="leaderboard-myrank" class="text-sm text-primary-700 font-semibold">Your Rank (State)</p>
+                                <p id="my-leaderboard-name" class="text-xl font-bold text-primary-800"></p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p data-translate="leaderboard-xp" class="text-sm text-primary-700">Total XP</p>
+                            <p id="my-leaderboard-xp" class="text-lg font-bold text-primary-800">0</p>
+                        </div>
+                    </div>
+
+                    <div id="leaderboard-list" class="space-y-3">
+                        <div class="bg-white p-3 rounded-lg shadow-sm flex items-center justify-between">
+                            <div class="flex items-center">
+                                <span class="text-lg font-bold w-6 text-center text-gray-600">#1</span>
+                                <img src="https://i.pravatar.cc/150?img=1" alt="Profile" class="w-10 h-10 rounded-full object-cover ml-3">
+                                <div class="ml-3">
+                                    <p class="font-semibold text-gray-800">Aarav Sharma</p>
+                                    <p class="text-xs text-gray-500">Swimming</p>
+                                </div>
+                            </div>
+                            <span class="text-lg font-bold text-primary-600">5,400 XP</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="info-page" class="page pt-6 px-4">
+                    <h2 data-translate="info-title" class="text-2xl font-bold text-gray-800 mb-6">About & Policy</h2>
+                    
+                    <div class="space-y-6">
+                        <div class="bg-white p-4 rounded-xl shadow-md">
+                            <h3 data-translate="about-app" class="text-xl font-bold text-primary-600 mb-3">About TalentTrack Pro</h3>
+                            <p data-translate="about-body" class="text-gray-700 leading-relaxed text-sm">
+                                TalentTrack Pro is an official tool by the **Sports Authority of India (SAI)** designed to democratize athlete performance tracking and talent identification. It aims to create a nationwide database of sports talent, ensuring no deserving athlete is overlooked, regardless of their location.
+                            </p>
+                        </div>
+
+                        <div class="bg-white p-4 rounded-xl shadow-md">
+                            <h3 data-translate="policy-title" class="text-xl font-bold text-primary-600 mb-3">Fair Play Policy</h3>
+                            <ul class="text-gray-700 space-y-2 list-disc ml-5 text-sm">
+                                <li data-translate="policy-point-1">All test submissions must be in the form of authentic, unedited videos.</li>
+                                <li data-translate="policy-point-2">The platform uses **AI-powered video analysis** to detect inconsistencies and potential cheating.</li>
+                                <li data-translate="policy-point-3">Any submission found to be fraudulent will result in immediate rejection and potential profile suspension.</li>
+                                <li data-translate="policy-point-4">Scores are reviewed by certified SAI coaches before XP is awarded.</li>
+                            </ul>
+                        </div>
+
+                        <div class="text-center text-sm text-gray-500 pt-4">
+                            <p>Version 1.0 (Prototype)</p>
+                            <p>&copy; 2024 Sports Authority of India</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="profile-page" class="page pt-6 px-4">
+                    <div class="flex items-center justify-between mb-6">
+                        <button onclick="navigateTo('home-page')" class="text-gray-600 hover:text-primary-600 transition">
+                            <svg data-lucide="arrow-left" class="w-6 h-6"></svg>
+                        </button>
+                        <h2 data-translate="profile-title" class="text-2xl font-bold text-gray-800 flex-grow text-center">My Profile</h2>
+                        <button id="edit-profile-btn" data-translate="edit-btn" class="text-primary-600 font-semibold text-sm hover:text-primary-800" onclick="toggleEditProfile()">Edit</button>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-xl shadow-lg mb-6 text-center">
+                        <img id="profile-picture" src="https://i.pravatar.cc/150?img=60" alt="Profile" class="w-24 h-24 rounded-full object-cover mx-auto mb-4 border-4 border-primary-200" onclick="document.getElementById('profile-pic-upload').click()">
+                        <input type="file" id="profile-pic-upload" accept="image/*" class="hidden" onchange="previewProfilePicture(event)">
+
+                        <h3 id="profile-name" class="text-2xl font-bold text-gray-800">Aarav Sharma</h3>
+                        <p id="profile-sport" class="text-lg text-primary-600 font-medium"></p>
+                        <p id="profile-age" class="text-md text-gray-500"></p>
+                        
+                        <div class="flex justify-center space-x-4 mt-4">
+                            <div class="bg-gray-100 p-2 rounded-lg">
+                                <p class="text-sm font-semibold text-gray-700">XP</p>
+                                <p id="profile-xp" class="text-xl font-bold text-primary-600">0</p>
+                            </div>
+                            <div class="bg-gray-100 p-2 rounded-lg">
+                                <p data-translate="profile-level" class="text-sm font-semibold text-gray-700">Level</p>
+                                <p id="profile-level-display" class="text-xl font-bold text-primary-600">1</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="profile-edit-form" class="bg-white p-6 rounded-xl shadow-lg mb-6 hidden space-y-4">
+                        <h4 data-translate="edit-title" class="text-xl font-bold text-gray-800 mb-4">Edit Details</h4>
+                        <input data-translate-placeholder="name-placeholder" type="text" id="edit-name" placeholder="Full Name" class="w-full p-3 border border-gray-300 rounded-lg">
+                        <input data-translate-placeholder="age-placeholder" type="number" id="edit-age" placeholder="Age" class="w-full p-3 border border-gray-300 rounded-lg">
+                        <select data-translate-placeholder="sport-placeholder" id="edit-sport" class="w-full p-3 border border-gray-300 rounded-lg bg-white">
+                            <option value="" disabled selected data-translate="sport-placeholder">Select Primary Sport</option>
+                            <option value="athletics" data-translate="sport-athletics">Athletics</option>
+                            <option value="swimming" data-translate="sport-swimming">Swimming</option>
+                            <option value="archery" data-translate="sport-archery">Archery</option>
+                            <option value="boxing" data-translate="sport-boxing">Boxing</option>
+                            <option value="football" data-translate="sport-football">Football</option>
+                            <option value="basketball" data-translate="sport-basketball">Basketball</option>
+                        </select>
+                        <button data-translate="save-btn" onclick="saveProfile()" class="w-full bg-primary-600 text-white p-3 rounded-lg font-semibold hover:bg-primary-700">Save Changes</button>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-xl shadow-lg mb-6">
+                        <h4 data-translate="badges-title" class="text-xl font-bold text-gray-800 mb-3">Badges Earned</h4>
+                        <div id="badges-container" class="grid grid-cols-4 gap-4 text-center">
+                            <div class="badge-item opacity-100 transition duration-300">
+                                <svg data-lucide="medal" class="w-10 h-10 mx-auto text-yellow-500"></svg>
+                                <p data-translate="badge-rookie" class="text-xs font-medium mt-1 text-gray-800">Rookie</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button data-translate="logout-btn" onclick="handleLogout()" class="w-full bg-red-500 text-white p-3 rounded-lg font-semibold hover:bg-red-600 transition">Logout</button>
+                    
+                </div>
+                
+                <div id="test-selection-page" class="page pt-6 px-4">
+                    <div class="flex items-center mb-6">
+                        <button onclick="navigateTo('home-page')" class="text-gray-600 hover:text-primary-600 transition">
+                            <svg data-lucide="arrow-left" class="w-6 h-6"></svg>
+                        </button>
+                        <h2 data-translate="test-select-title" class="text-2xl font-bold text-gray-800 flex-grow text-center">Select Performance Test</h2>
+                        <div class="w-6 h-6"></div> </div>
+
+                    <div id="test-list" class="space-y-4">
+                        <div data-test-id="pushups" class="bg-white p-4 rounded-xl shadow-md flex items-center justify-between hover:shadow-lg transition cursor-pointer" onclick="selectTest('pushups')">
+                            <div class="flex items-center">
+                                <svg data-lucide="armchair" class="w-8 h-8 text-primary-500 mr-3"></svg>
+                                <div>
+                                    <p data-translate="test-pushups-title" class="font-bold text-gray-800">Push-ups (Max in 60 sec)</p>
+                                    <p data-translate="test-pushups-desc" class="text-sm text-gray-500">Measures muscular endurance.</p>
+                                </div>
+                            </div>
+                            <svg data-lucide="chevron-right" class="w-5 h-5 text-gray-400"></svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="submission-options-page" class="page pt-6 px-4">
+                    <div class="flex items-center mb-10">
+                        <button onclick="navigateTo('test-selection-page')" class="text-gray-600 hover:text-primary-600 transition">
+                            <svg data-lucide="arrow-left" class="w-6 h-6"></svg>
+                        </button>
+                        <h2 data-translate="submit-title" class="text-2xl font-bold text-gray-800 flex-grow text-center">Submit <span id="test-name-submit" class="text-primary-600">Test</span></h2>
+                        <div class="w-6 h-6"></div> </div>
+
+                    <div class="space-y-6">
+                        <div class="bg-white p-6 rounded-xl shadow-lg text-center">
+                            <h3 data-translate="instructions-title" class="text-xl font-bold text-gray-800 mb-3">Instructions</h3>
+                            <p id="test-instructions" class="text-gray-600 text-sm leading-relaxed">Instructions will be loaded here...</p>
+                        </div>
+
+                        <button data-translate="record-video-btn" onclick="navigateTo('record-page')" class="w-full bg-primary-600 text-white p-4 rounded-xl shadow-lg shadow-primary-300 text-lg font-bold flex items-center justify-center space-x-3 hover:bg-primary-700 transition duration-150">
+                            <svg data-lucide="video" class="w-6 h-6"></svg>
+                            <span>Record Live Video</span>
+                        </button>
+
+                        <button data-translate="upload-file-btn" onclick="navigateTo('upload-page')" class="w-full bg-primary-600 text-white p-4 rounded-xl shadow-lg shadow-primary-300 text-lg font-bold flex items-center justify-center space-x-3 hover:bg-primary-700 transition duration-150">
+                            <svg data-lucide="upload" class="w-6 h-6"></svg>
+                            <span>Upload from Device</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="record-page" class="page pt-6 px-4">
+                    <div class="flex items-center mb-6">
+                        <button onclick="navigateTo('submission-options-page')" class="text-gray-600 hover:text-primary-600 transition">
+                            <svg data-lucide="arrow-left" class="w-6 h-6"></svg>
+                        </button>
+                        <h2 data-translate="record-title" class="text-2xl font-bold text-gray-800 flex-grow text-center">Record Video</h2>
+                        <div class="w-6 h-6"></div> </div>
+
+                    <div class="bg-black w-full aspect-video rounded-xl overflow-hidden mb-4">
+                        <video id="video-preview" autoplay class="w-full h-full object-cover"></video>
+                        <div id="camera-access-error" class="flex flex-col items-center justify-center h-full text-white p-4 text-center hidden">
+                            <svg data-lucide="video-off" class="w-10 h-10 mb-2"></svg>
+                            <p data-translate="camera-error-message">Camera access denied or not available. Please check permissions.</p>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-center space-x-4">
+                        <button data-translate="start-record-btn" id="start-record-btn" onclick="startRecording()" class="bg-red-500 text-white p-3 rounded-full w-16 h-16 flex items-center justify-center hover:bg-red-600 transition">
+                            <svg data-lucide="circle" class="w-8 h-8 fill-white"></svg>
+                        </button>
+                        <button data-translate="stop-record-btn" id="stop-record-btn" onclick="stopRecording()" class="bg-gray-500 text-white p-3 rounded-full w-16 h-16 flex items-center justify-center hover:bg-gray-600 transition hidden">
+                            <svg data-lucide="square" class="w-8 h-8 fill-white"></svg>
+                        </button>
+                    </div>
+
+                    <p data-translate="recording-status" id="recording-status" class="text-center mt-4 text-gray-500">Ready to record...</p>
+                    
+                    <button data-translate="submit-video-btn" id="submit-recorded-btn" onclick="submitVideo()" class="w-full bg-primary-600 text-white p-3 rounded-lg font-semibold mt-6 hidden hover:bg-primary-700">Submit Video for Review</button>
+                </div>
+
+                <div id="upload-page" class="page pt-6 px-4">
+                    <div class="flex items-center mb-6">
+                        <button onclick="navigateTo('submission-options-page')" class="text-gray-600 hover:text-primary-600 transition">
+                            <svg data-lucide="arrow-left" class="w-6 h-6"></svg>
+                        </button>
+                        <h2 data-translate="upload-title" class="text-2xl font-bold text-gray-800 flex-grow text-center">Upload Video</h2>
+                        <div class="w-6 h-6"></div> </div>
+                    
+                    <div class="bg-white p-6 rounded-xl shadow-lg mb-6 text-center border-2 border-dashed border-gray-300">
+                        <input type="file" id="video-upload" accept="video/*" class="hidden" onchange="previewUploadedVideo(event)">
+                        <button data-translate="choose-file-btn" onclick="document.getElementById('video-upload').click()" class="bg-gray-200 text-gray-700 p-3 rounded-lg font-semibold hover:bg-gray-300 transition flex items-center justify-center mx-auto space-x-2">
+                            <svg data-lucide="folder-open" class="w-5 h-5"></svg>
+                            <span>Choose Video File</span>
+                        </button>
+                        <p id="uploaded-file-name" class="text-sm text-gray-500 mt-3"></p>
+                    </div>
+
+                    <div class="bg-black w-full aspect-video rounded-xl overflow-hidden mb-6">
+                        <video id="uploaded-video-preview" controls class="w-full h-full object-cover"></video>
+                        <div id="no-video-preview" class="flex flex-col items-center justify-center h-full text-white p-4 text-center">
+                            <svg data-lucide="video-off" class="w-10 h-10 mb-2"></svg>
+                            <p data-translate="no-video-selected">No video selected for preview.</p>
+                        </div>
+                    </div>
+
+                    <button data-translate="submit-video-btn" id="submit-uploaded-btn" onclick="submitVideo()" class="w-full bg-primary-600 text-white p-4 rounded-xl shadow-lg text-lg font-bold hover:bg-primary-700" disabled>Submit Video for Review</button>
+                </div>
+
+
+            </div>
+
+            <nav id="nav-bar" class="fixed bottom-0 w-full max-w-md bg-white border-t border-gray-200 shadow-xl z-10 mx-auto">
+                <div class="flex justify-around items-center h-16">
+                    <button data-translate-title="nav-home" onclick="navigateTo('home-page')" class="nav-item flex flex-col items-center text-gray-500 hover:text-primary-600 transition duration-150 active-nav-item" data-page="home-page">
+                        <svg data-lucide="home" class="w-6 h-6"></svg>
+                        <span data-translate="nav-home" class="text-xs mt-1">Home</span>
+                    </button>
+                    <button data-translate-title="nav-activity" onclick="navigateTo('submissions-page')" class="nav-item flex flex-col items-center text-gray-500 hover:text-primary-600 transition duration-150" data-page="submissions-page">
+                        <svg data-lucide="file-text" class="w-6 h-6"></svg>
+                        <span data-translate="nav-activity" class="text-xs mt-1">Activity</span>
+                    </button>
+                    <button data-translate-title="nav-leaderboard" onclick="navigateTo('leaderboard-page')" class="nav-item flex flex-col items-center text-gray-500 hover:text-primary-600 transition duration-150" data-page="leaderboard-page">
+                        <svg data-lucide="trophy" class="w-6 h-6"></svg>
+                        <span data-translate="nav-leaderboard" class="text-xs mt-1">Leaderboard</span>
+                    </button>
+                    <button data-translate-title="nav-info" onclick="navigateTo('info-page')" class="nav-item flex flex-col items-center text-gray-500 hover:text-primary-600 transition duration-150" data-page="info-page">
+                        <svg data-lucide="info" class="w-6 h-6"></svg>
+                        <span data-translate="nav-info" class="text-xs mt-1">Info</span>
+                    </button>
+                </div>
+            </nav>
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+    <script>
+        // Initialize lucide icons at the end
+        lucide.createIcons();
+    </script>
+</body>
+</html>
